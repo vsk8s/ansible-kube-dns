@@ -4,6 +4,4 @@ kube_dns_kubeconfig: "~/.kube/config"
 kube_dns_state: "present"
 
 kubernetes_dns_service_ip: "10.0.8.8"
-
-# this is also used in kubelet, should it be defined globally?
-kube_dns_cluster_domain: cluster.local
+kubernetes_cluster_domain: cluster.local
