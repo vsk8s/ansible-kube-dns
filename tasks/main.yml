@@ -177,13 +177,13 @@
                     port: 8080
                     scheme: HTTP
                 dnsPolicy: Default
-                volumes:
-                  - name: config-volume
-                    configMap:
-                      name: coredns
-                      items:
-                        - key: Corefile
-                          path: Corefile
+            volumes:
+              - name: config-volume
+                configMap:
+                  name: coredns
+                  items:
+                    - key: Corefile
+                      path: Corefile
 
 - name: Deploy Service for kube-dns to cluster
   local_action:
