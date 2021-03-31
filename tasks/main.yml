@@ -48,6 +48,13 @@
             - nodes
           verbs:
             - get
+        - apiGroups:
+            - discovery.k8s.io
+          resources:
+            - endpointslices
+          verbs:
+            - list
+            - watch
 
 - name: Deploy ClusterRoleBinding for kube-dns to cluster
   local_action:
@@ -90,7 +97,6 @@
               health
               kubernetes {{ kubernetes_cluster_domain }} in-addr.arpa ip6.arpa {
                 pods insecure
-                upstream
                 fallthrough in-addr.arpa ip6.arpa
               }
               prometheus :9153
