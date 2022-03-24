@@ -1,6 +1,7 @@
 ---
 
 - name: Gather router facts
+  when: kubernetes_ansible_router_group is defined
   setup:
   delegate_to: "{{ item }}"
   delegate_facts: True
@@ -106,7 +107,11 @@
                 fallthrough in-addr.arpa ip6.arpa
               }
               prometheus :9153
+              {% if kubernetes_manual_upstream_ips == [] %}
               forward . {% for router in groups[kubernetes_ansible_router_group] %}{{ hostvars[router]['ansible_all_ipv4_addresses'] | ipaddr('private') | join(' ') }} {% endfor %}
+              {% else %}
+              forward . {% for upstream in kubernetes_manual_upstream_ips %}{{ upstream }} {% endfor %}
+              {% endif %}
 
               cache 30
               loop

@@ -6,3 +6,5 @@ kube_dns_coredns_version: "1.8.7"
 
 kubernetes_dns_service_ip: "10.0.8.8"
 kubernetes_cluster_domain: cluster.local
+
+kubernetes_manual_upstream_ips: []
