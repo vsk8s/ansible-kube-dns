@@ -1,6 +1,7 @@
 ---
 
 - name: Gather router facts
+  when: kubernetes_ansible_router_group is defined
   setup:
   delegate_to: "{{ item }}"
   delegate_facts: True
@@ -42,6 +43,12 @@
           verbs:
             - list
             - watch
+        - apiGroups: [ "discovery.k8s.io" ]
+          resources:
+            - endpointslices
+          verbs:
+            - watch
+            - list
         - apiGroups:
             - ""
           resources:
@@ -100,7 +107,11 @@
                 fallthrough in-addr.arpa ip6.arpa
               }
               prometheus :9153
+              {% if kubernetes_manual_upstream_ips == [] %}
               forward . {% for router in groups[kubernetes_ansible_router_group] %}{{ hostvars[router]['ansible_all_ipv4_addresses'] | ipaddr('private') | join(' ') }} {% endfor %}
+              {% else %}
+              forward . {% for upstream in kubernetes_manual_upstream_ips %}{{ upstream }} {% endfor %}
+              {% endif %}
 
               cache 30
               loop
@@ -123,6 +134,16 @@
           k8s-app: kube-dns
           kubernetes.io/name: "CoreDNS"
       spec:
+        affinity:
+          podAntiAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              - labelSelector:
+                  matchExpressions:
+                    - key: k8s-app
+                      operator: In
+                      values:
+                        - kube-dns
+                topologyKey: "kubernetes.io/hostname"
         replicas: 2
         strategy:
           type: RollingUpdate
